@@ -26,32 +26,29 @@ import { useUser } from '../../hook/useUser';
 export interface ILoginProps {}
 
 export default function Login(props: ILoginProps) {
-  const { currUser } = useUser();
+  const { user, login, loading } = useUser();
+  // const user = null
+  // const login = (a, b) => { }
+  // const loading = false
   const [form] = useForm();
   const history = useHistory();
-  const { toasts, showToast } = useToast();
-  const loading = false;
-  let error: any;
-  // const {
-  //   login,
-  //   state: { loading, data, error },
-  // } = useLoginMutation();
+  const { showToast } = useToast();
 
   const handleLogin = values => {
-    console.log(values);
+    // console.log(values);
     // setTimeout(() => {
     //   form.setFieldsValue({ username: "aaa" });
     // }, 500);
-    showToast('登录成功');
-    history.push('/ext');
     // login(username.trim(), password.trim());
+    login(values.userId, (err, u) => {
+      if (!err) {
+        showToast('登录成功');
+        setTimeout(() => {
+          history.push('/ext');
+        }, 1000);
+      }
+    });
   };
-  // if (error) {
-  //   console.log(error.message);
-  // }
-  // if (data && !loading) {
-  //   router.push({ pathname: `/data-max` });
-  // }
   return (
     <Empty dark={getTheme() != 'light'}>
       <EuiPage>
@@ -79,7 +76,7 @@ export default function Login(props: ILoginProps) {
                 // initialValues={{ username: 'strange' }}
               >
                 <FormRow
-                  name="username"
+                  name="userId"
                   label="用户名"
                   rules={[{ required: true }]}
                 >

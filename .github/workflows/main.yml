@@ -26,6 +26,6 @@ jobs:
           secretKey: ${{ secrets.SECRET_KEY }}
           envId: ${{ secrets.ENV_ID }}
           staticSrcPath: build
-          staticIgnore: ".test,.git"
+          staticIgnore: ".test,.git,.DS_Store"
       - name: Get the deploy result
         run: echo "Deploy to cloudbase result ${{ steps.deployStatic.outputs.deployResult }}"

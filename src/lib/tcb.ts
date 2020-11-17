@@ -5,6 +5,5 @@ export const getApp = () => {
   const app = cloudbase.init({
     env: config.envId!,
   });
-  app.auth({ persistence: 'session' });
   return app;
 };

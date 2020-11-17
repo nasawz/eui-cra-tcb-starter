@@ -9,6 +9,7 @@ import Login from './login';
 import Ext from './ext';
 import ExtForm from './ext/form';
 import ExtList from './ext/list';
+import { useUser } from '../hook/useUser';
 
 export interface IAppProps {
   children?: any;
@@ -63,7 +64,8 @@ function NoMatch() {
 
 export default function App(props: IAppProps) {
   // const location = useLocation();
-  const loggedIn = true;
+  const { user } = useUser();
+
   return (
     <>
       <Helmet>
@@ -72,12 +74,12 @@ export default function App(props: IAppProps) {
       <EuiErrorBoundary>
         <Switch>
           <Route exact path="/">
-            {loggedIn ? <Redirect to="/ext" /> : <Redirect to="/login" />}
+            {user ? <Redirect to="/ext" /> : <Redirect to="/login" />}
           </Route>
-          <Route exact={true} path="/login" component={Login} />
+          <Route exact path="/login" component={Login} />
           <Chrome>
             <Switch>
-              <Route exact={true} path="/ext" component={Ext} />
+              <Route exact path="/ext" component={Ext} />
               <Route path="/ext/list" component={ExtList} />
               <Route path="/ext/form" component={ExtForm} />
               <Route path="*">

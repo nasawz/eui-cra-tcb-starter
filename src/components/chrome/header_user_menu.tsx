@@ -13,10 +13,13 @@ import {
 } from '@elastic/eui';
 import * as React from 'react';
 import { useHistory } from 'react-router';
+import { useUser } from '../../hook/useUser';
 
 export interface IHeaderUserMenuProps {}
 
 export default function HeaderUserMenu(props: IHeaderUserMenuProps) {
+  const { user, logout } = useUser();
+
   const id = htmlIdGenerator()();
   const history = useHistory();
   const [isOpen, setIsOpen] = React.useState(false);
@@ -30,9 +33,9 @@ export default function HeaderUserMenu(props: IHeaderUserMenuProps) {
   const [isLogoutModalVisible, setIsLogoutModalVisible] = React.useState(false);
   const showLogoutModal = () => setIsLogoutModalVisible(true);
   const closeLogoutModal = () => setIsLogoutModalVisible(false);
-  const currentUser = {
-    username: 'nasawz',
-  };
+  // const currentUser = {
+  //   username: 'nasawz',
+  // };
   const button = (
     <EuiHeaderSectionItemButton
       aria-controls={id}
@@ -41,7 +44,7 @@ export default function HeaderUserMenu(props: IHeaderUserMenuProps) {
       aria-label="Account menu"
       onClick={onMenuButtonClick}
     >
-      <EuiAvatar name={currentUser ? currentUser.username : ''} size="s" />
+      <EuiAvatar name={user ? user.nickName : ''} size="s" />
     </EuiHeaderSectionItemButton>
   );
   let logoutConfirmModal;
@@ -52,6 +55,7 @@ export default function HeaderUserMenu(props: IHeaderUserMenuProps) {
           title="确定要退出系统吗？"
           onCancel={closeLogoutModal}
           onConfirm={() => {
+            logout();
             history.push({ pathname: `/login` });
           }}
           cancelButtonText="取消"
@@ -78,15 +82,12 @@ export default function HeaderUserMenu(props: IHeaderUserMenuProps) {
           responsive={false}
         >
           <EuiFlexItem grow={false}>
-            <EuiAvatar
-              name={currentUser ? currentUser.username : ''}
-              size="xl"
-            />
+            <EuiAvatar name={user ? user.nickName : ''} size="xl" />
           </EuiFlexItem>
 
           <EuiFlexItem>
             <EuiText>
-              <p>{currentUser ? currentUser.username : ''}</p>
+              <p>{user ? user.nickName : ''}</p>
             </EuiText>
 
             <EuiSpacer size="m" />
