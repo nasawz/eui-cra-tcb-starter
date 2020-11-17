@@ -41,7 +41,7 @@ export default function Login(props: ILoginProps) {
     //   form.setFieldsValue({ username: "aaa" });
     // }, 500);
     showToast('登录成功');
-    // history.push('/ext');
+    history.push('/ext');
     // login(username.trim(), password.trim());
   };
   // if (error) {

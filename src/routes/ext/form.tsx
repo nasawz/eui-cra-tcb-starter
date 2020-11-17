@@ -49,8 +49,8 @@ export default function ExtForm(props: IExtFormProps) {
             className="euiForm"
             initialValues={{
               chk: true,
-              chkGroup: { demo2: true },
-              radioGroup: 'demo2',
+              chkGroup: { chkGroupdemo1: true },
+              radioGroup: 'radioGroupdemo1',
               comboBox: [{ label: 'Mimas' }],
               superSelect: 'option_two',
               colorPicker: '#8A6565',
@@ -71,9 +71,9 @@ export default function ExtForm(props: IExtFormProps) {
             >
               <ButtonGroup
                 options={[
-                  { id: 'demo1', label: '西瓜' },
-                  { id: 'demo2', label: '卷心菜' },
-                  { id: 'demo3', label: '水蜜桃' },
+                  { id: 'buttonGroupdemo1', label: '西瓜' },
+                  { id: 'buttonGroupdemo2', label: '卷心菜' },
+                  { id: 'buttonGroupdemo3', label: '水蜜桃' },
                 ]}
               />
             </FormRow>
@@ -235,9 +235,9 @@ export default function ExtForm(props: IExtFormProps) {
             >
               <RadioGroup
                 options={[
-                  { id: 'demo1', label: '西瓜' },
-                  { id: 'demo2', label: '卷心菜' },
-                  { id: 'demo3', label: '水蜜桃', disabled: true },
+                  { id: 'radioGroupdemo1', label: '西瓜' },
+                  { id: 'radioGroupdemo2', label: '卷心菜' },
+                  { id: 'radioGroupdemo3', label: '水蜜桃', disabled: true },
                 ]}
               />
             </FormRow>
@@ -258,9 +258,9 @@ export default function ExtForm(props: IExtFormProps) {
             >
               <CheckboxGroup
                 options={[
-                  { id: 'demo1', label: '西瓜' },
-                  { id: 'demo2', label: '卷心菜' },
-                  { id: 'demo3', label: '水蜜桃', disabled: true },
+                  { id: 'chkGroupdemo1', label: '西瓜' },
+                  { id: 'chkGroupdemo2', label: '卷心菜' },
+                  { id: 'chkGroupdemo3', label: '水蜜桃', disabled: true },
                 ]}
               />
             </FormRow>

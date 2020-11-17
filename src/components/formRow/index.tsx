@@ -5,12 +5,14 @@ import { ReactNode } from 'react';
 
 export interface IFormRowProps {
   label?: React.ReactNode;
-  name: string;
+  name: any;
   children: ReactNode;
   rules?: any;
   helpText?: any;
   labelAppend?: any;
   hasChildLabel?: any;
+  messageVariables?: any;
+  dependencies?: any;
 }
 
 export default function FormRow(props: IFormRowProps) {
@@ -23,6 +25,7 @@ export default function FormRow(props: IFormRowProps) {
     hasChildLabel,
     ...restProps
   } = props;
+
   return (
     <Field name={name} {...restProps}>
       {(control, meta, form) => {
