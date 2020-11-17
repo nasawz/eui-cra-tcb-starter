@@ -22,9 +22,11 @@ import bgloginPath from './assets/bg_login.svg';
 import { getTheme } from '../../lib/theme';
 import Form, { Field, useForm } from 'rc-field-form';
 import FormRow from '../../components/formRow';
+import { useUser } from '../../hook/useUser';
 export interface ILoginProps {}
 
 export default function Login(props: ILoginProps) {
+  const { currUser } = useUser();
   const [form] = useForm();
   const history = useHistory();
   const { toasts, showToast } = useToast();

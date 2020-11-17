@@ -1,7 +1,5 @@
 const {
   override,
-  // fixBabelImports,
-  addLessLoader,
   addWebpackPlugin,
   overrideDevServer,
   addWebpackExternals,
@@ -14,15 +12,13 @@ const webpack = require("webpack");
 const RewireWebpackOutput = require("react-app-rewire-output");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-
-const crypto = require('crypto');
-const fs = require('fs');
+const cloudbaseConfig = require('./cloudbaserc')
 const glob = require('glob');
 
-// const JavaScriptObfuscator = require('webpack-obfuscator');
-// const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin')
 const _ = require("lodash")
 let pkgJson = {};
+
+const envId = (cloudbaseConfig.envId === '{{envId}}') ? process.env.envId : cloudbaseConfig.envId
 
 try {
   pkgJson = require(resolve('package.json'));
@@ -56,13 +52,6 @@ const webpackConfig = (publicPath) => (config, env) => {
     filename: `static/js/${_.kebabCase(pkgJson.name)}_${pkgJson.version}.js`
   });
 
-  // if (config.mode === 'production') {
-  //   config.plugins.push(
-  //     new JavaScriptObfuscator({
-  //       stringArrayEncoding: 'rc4',
-  //     }, [])
-  //   )
-  // }
   return config;
 };
 
@@ -71,18 +60,7 @@ module.exports = {
     webpackConfig('./'),
     disableEsLint(),
     rewiredMap(),
-    // fixBabelImports("import", {
-    //   libraryName: "antd",
-    //   libraryDirectory: "es",
-    //   style: true
-    // }),
     addWebpackExternals(externals),
-    // addLessLoader({
-    //   lessOptions: {
-    //     javascriptEnabled: true,
-    //     // modifyVars: modifyVars
-    //   }
-    // }),
     addWebpackPlugin(
       new CopyWebpackPlugin({ patterns: themeConfig.copyConfig })
     ),
@@ -91,6 +69,7 @@ module.exports = {
         "process.env": {
           VERSION: `"${pkgJson.version}"`,
           THEME_CONFIG: JSON.stringify(themeConfig),
+          TCB_ENV_ID: `"${envId}"`
         }
       })
     ),
@@ -99,9 +78,6 @@ module.exports = {
         filename: `static/css/${_.kebabCase(pkgJson.name)}_${pkgJson.version}.css`
       })
     ),
-    // addWebpackPlugin(
-    //   new AntdDayjsWebpackPlugin()
-    // ),
     adjustStyleLoaders((loader) => {
       const mode = process.env.NODE_ENV === 'production' ? 'prod' : 'dev';
       if (mode === 'dev') {

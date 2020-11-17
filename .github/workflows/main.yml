@@ -1,0 +1,29 @@
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Tencent Cloudbase Github Action
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: build
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - run: npm install
+      - run: npm run build
+        env:
+          CI: true
+          envId: ${{ secrets.ENV_ID }}
+      - name: Deploy
+        id: deployStatic
+        uses: TencentCloudBase/cloudbase-action@v1.1.1
+        with:
+          secretId: ${{ secrets.SECRET_ID }}
+          secretKey: ${{ secrets.SECRET_KEY }}
+          envId: ${{ secrets.ENV_ID }}
+          staticSrcPath: build
+          staticIgnore: ".test,.git"
+      - name: Get the deploy result
+        run: echo "Deploy to cloudbase result ${{ steps.deployStatic.outputs.deployResult }}"

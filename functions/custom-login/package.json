@@ -1,0 +1,11 @@
+{
+  "name": "custom-login",
+  "version": "0.1.0",
+  "main": "index.js",
+  "author": "nasa127@gmail.com",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "tcb-admin-node": "^1.23.0"
+  }
+}
