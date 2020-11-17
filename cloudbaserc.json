@@ -2,27 +2,6 @@
   "version": "2.0",
   "envId": "{{envId}}",
   "$schema": "https://framework-1258016615.tcloudbaseapp.com/schema/latest.json",
-  "functionRoot": "functions",
-  "functions": [
-    {
-      "name": "custom-login",
-      "config": {
-        "timeout": 5,
-        "envVariables": {},
-        "runtime": "Nodejs10.15",
-        "memorySize": 128
-      }
-    },
-    {
-      "name": "base64",
-      "config": {
-        "timeout": 5,
-        "envVariables": {},
-        "runtime": "Nodejs10.15",
-        "memorySize": 128
-      }
-    }
-  ],
   "framework": {
     "name": "eui-cra-tcb-starter",
     "plugins": {
@@ -36,7 +15,30 @@
       "function": {
         "use": "@cloudbase/framework-plugin-function",
         "inputs": {
-          "functionRootPath": "functions"
+          "functionRoot": "functions",
+          "functions": [
+            {
+              "name": "custom-login",
+              "config": {
+                "timeout": 5,
+                "envVariables": {},
+                "runtime": "Nodejs10.15",
+                "memorySize": 128
+              }
+            },
+            {
+              "name": "base64",
+              "config": {
+                "timeout": 5,
+                "envVariables": {},
+                "runtime": "Nodejs10.15",
+                "memorySize": 128
+              }
+            }
+          ],
+          "servicePaths": {
+            "custom-login": "/login"
+          }
         }
       },
       "db": {

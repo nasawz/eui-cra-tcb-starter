@@ -1,12 +1,12 @@
 import { getApp } from '../lib/tcb';
 import { config } from '../config';
 import { useState } from 'react';
+const app = getApp();
+const auth = app.auth({ persistence: 'session' });
 
 const ticketUrl = `https://${config.envId}.service.tcloudbase.com/login`;
 
 export function useUser() {
-  const app = getApp();
-  const auth = app.auth({ persistence: 'session' });
   const [user, setUser]: any = useState(auth.currentUser);
   const [loading, setLoading] = useState(false);
   const login = (userId, cb) => {

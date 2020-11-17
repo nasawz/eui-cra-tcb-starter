@@ -28,6 +28,7 @@ import * as React from 'react';
 import { useRef } from 'react';
 import { useState } from 'react';
 import FormRow from '../../components/formRow';
+import { useDemoWeb } from '../../hook/useDemoWeb';
 
 export interface IExtListProps {}
 
@@ -40,7 +41,8 @@ export default function ExtList(props: IExtListProps) {
     sortDirection: 'desc',
     search: '',
   });
-
+  const { data, error } = useDemoWeb(dataParams);
+  const isLoading = !error && !data;
   const [selectedItems, setSelectedItems] = useState([]);
 
   const tableRef: any = useRef();
@@ -94,7 +96,7 @@ export default function ExtList(props: IExtListProps) {
   const pagination: any = {
     pageIndex: dataParams.pageIndex,
     pageSize: dataParams.pageSize,
-    totalItemCount: 0, //TODO count
+    totalItemCount: data ? data.count : 0,
     hidePerPageOptions: true,
   };
 
@@ -203,9 +205,9 @@ export default function ExtList(props: IExtListProps) {
   const renderDataTable = () => {
     return (
       <EuiBasicTable
-        // loading={loading}
+        loading={isLoading}
         ref={tableRef}
-        items={[]}
+        items={data ? data.list : []}
         itemId="objectId"
         columns={columns}
         pagination={pagination}
