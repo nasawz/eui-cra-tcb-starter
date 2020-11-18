@@ -20,15 +20,19 @@ import {
   EuiText,
   EuiFieldText,
   EuiFieldPassword,
+  EuiConfirmModal,
+  EuiOverlayMask,
+  EuiTextColor,
 } from '@elastic/eui';
 import _ from 'lodash';
 import moment from 'moment';
-import Form, { useForm } from 'rc-field-form';
+import Form, { Field, useForm } from 'rc-field-form';
 import * as React from 'react';
-import { useRef } from 'react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import FormRow from '../../components/formRow';
-import { useDemoWeb } from '../../hook/useDemoWeb';
+import { useDemoWeb, useDemoWebById } from '../../hook/useDemoWeb';
+import { useDemoWebMuation } from '../../hook/useDemoWebMuation';
+import { useToast } from '../../hook/useToast';
 
 export interface IExtListProps {}
 
@@ -41,9 +45,19 @@ export default function ExtList(props: IExtListProps) {
     sortDirection: 'desc',
     search: '',
   });
-  const { data, error } = useDemoWeb(dataParams);
-  const isLoading = !error && !data;
+  const [editId, setEditId] = useState(null);
+  const { data, error, mutate } = useDemoWeb(dataParams);
+  const {
+    data: editData,
+    error: editError,
+    mutate: editMutate,
+  }: any = useDemoWebById(editId);
+
   const [selectedItems, setSelectedItems] = useState([]);
+  const isLoading = !error && !data;
+  const isEditLoading = !editError && !editData;
+  const { create, update, destroy, state } = useDemoWebMuation();
+  const { showToast } = useToast();
 
   const tableRef: any = useRef();
 
@@ -83,8 +97,11 @@ export default function ExtList(props: IExtListProps) {
         <EuiButton
           color="danger"
           onClick={() => {
-            // setIsBatchDel(true);
-            // showDestroyModal();
+            console.log(selectedItems);
+            const ids = selectedItems.map((o: any) => {
+              return o._id;
+            });
+            showDestroyModal(ids);
           }}
         >
           删除 ({selectedItems.length})
@@ -123,18 +140,22 @@ export default function ExtList(props: IExtListProps) {
       description: '编辑',
       icon: 'pencil',
       type: 'icon',
-      onClick: item => {},
+      onClick: item => {
+        showFlyout(item._id);
+      },
       isPrimary: true,
       'data-test-subj': 'action-edit',
     },
     {
-      name: item => (item.objectId ? '删除' : ''),
+      name: item => (item._id ? '删除' : ''),
       available: data => true, //TODO
       description: '删除',
       icon: 'trash',
       color: 'danger',
       type: 'icon',
-      onClick: item => {},
+      onClick: item => {
+        showDestroyModal([item._id]);
+      },
       isPrimary: true,
       'data-test-subj': 'action-delete',
     },
@@ -192,7 +213,13 @@ export default function ExtList(props: IExtListProps) {
             wrap
           >
             <EuiFlexItem grow={false}>
-              <EuiButton fill iconType="plusInCircle" onClick={showFlyout}>
+              <EuiButton
+                fill
+                iconType="plusInCircle"
+                onClick={() => {
+                  showFlyout(null);
+                }}
+              >
                 Create
               </EuiButton>
             </EuiFlexItem>
@@ -208,7 +235,7 @@ export default function ExtList(props: IExtListProps) {
         loading={isLoading}
         ref={tableRef}
         items={data ? data.list : []}
-        itemId="objectId"
+        itemId="_id"
         columns={columns}
         pagination={pagination}
         sorting={sorting}
@@ -220,32 +247,103 @@ export default function ExtList(props: IExtListProps) {
     );
   };
 
+  const [destroyModalConf, setDestroyModalConf] = useState({
+    isDestroyModalVisible: false,
+    ids: null,
+  });
+  const closeDestroyModal = () =>
+    setDestroyModalConf({ isDestroyModalVisible: false, ids: null });
+  const showDestroyModal = ids =>
+    setDestroyModalConf({ isDestroyModalVisible: true, ids });
+  const confirmDestroy = () => {
+    // destroyModalConf.id
+    // destroyModalConf.ids
+    if (destroyModalConf.ids) {
+      destroy(destroyModalConf.ids, err => {
+        if (!err) {
+          showToast('删除成功');
+          mutate();
+        }
+      });
+    }
+    closeDestroyModal();
+  };
+  let destroyModal;
+  if (destroyModalConf.isDestroyModalVisible) {
+    destroyModal = (
+      <EuiOverlayMask>
+        <EuiConfirmModal
+          title="Do this destructive thing"
+          onCancel={closeDestroyModal}
+          onConfirm={confirmDestroy}
+          cancelButtonText="No, don't do it"
+          confirmButtonText="Yes, do it"
+          buttonColor="danger"
+          defaultFocusedButton="confirm"
+        >
+          <p>You&rsquo;re about to destroy something.</p>
+          <p>Are you sure you want to do this?</p>
+        </EuiConfirmModal>
+      </EuiOverlayMask>
+    );
+  }
+
   // ==================== Form
   const [form] = useForm();
   const handleFinish = values => {
-    console.log(values);
+    if (!editId) {
+      create(values, err => {
+        if (!err) {
+          mutate();
+          closeFlyout();
+          form.resetFields();
+          showToast('创建成功');
+        }
+      });
+    } else {
+      update(editId, values, err => {
+        if (!err) {
+          mutate();
+          closeFlyout();
+          form.resetFields();
+          showToast('更新成功');
+        }
+      });
+    }
   };
   const renderForm = () => {
-    return (
-      <Form
-        form={form}
-        validateMessages={{
-          default: '${name} 看起来怪怪的……',
-          required: '你需要一个 ${displayName}',
-          types: {
-            number: '嗨，这个 ${name} 不是一个合格的 ${type}',
-          },
-          enum: '${name} 不在 ${enum} 中呢',
-          whitespace: '${name} 不可以是空的啦',
-          pattern: {
-            mismatch: '${name} 并不符合格式：${pattern}',
-          },
-        }}
-        onFinish={handleFinish}
-        className="euiForm"
-        initialValues={{}}
-      >
-        {/* <FormRow
+    if ((editId && editData) || !editId) {
+      return (
+        <Form
+          form={form}
+          validateMessages={{
+            default: '${name} 看起来怪怪的……',
+            required: '你需要一个 ${displayName}',
+            types: {
+              number: '嗨，这个 ${name} 不是一个合格的 ${type}',
+            },
+            enum: '${name} 不在 ${enum} 中呢',
+            whitespace: '${name} 不可以是空的啦',
+            pattern: {
+              mismatch: '${name} 并不符合格式：${pattern}',
+            },
+          }}
+          onFinish={handleFinish}
+          className="euiForm"
+          initialValues={editId ? editData : {}}
+        >
+          {/* <Field name="_id" >
+            {(control, meta, context) => {
+              const { _id } = context.getFieldsValue(true);
+              return _id && (
+                <EuiFormRow label="_id" style={{ display: 'none' }}>
+                  <EuiFieldText value={_id} readOnly disabled />
+                </EuiFormRow>
+              );
+            }}
+          </Field> */}
+
+          {/* <FormRow
           name="txt"
           label="EuiFieldText"
           helpText="I am some friendly help text."
@@ -298,46 +396,84 @@ export default function ExtList(props: IExtListProps) {
           <EuiFieldPassword />
         </FormRow> */}
 
-        <FormRow
-          name="title"
-          label="title"
-          helpText="I am some friendly help text."
-          messageVariables={{ displayName: '标题' }}
-          rules={[
-            { required: true },
-            // { required: true, message: <h1>我是 ReactNode</h1> },
-            // { type: 'number' },
-            // { type: 'enum', enum: ['aaa', 'bbb'] },
-            // { type: 'date' },
-            // { whitespace: true },
-            // { pattern: /^\w{3}$/ },
-            // {
-            //   message: '至少两个字符!',
-            //   validator: async (_, value) => {
-            //     if (value.length < 2) {
-            //       throw new Error();
-            //     }
-            //   },
-            // }
-          ]}
-        >
-          <EuiFieldText />
-        </FormRow>
-        <EuiSpacer />
+          <FormRow
+            name="title"
+            label="title"
+            helpText="I am some friendly help text."
+            messageVariables={{ displayName: '标题' }}
+            rules={[
+              { required: true },
+              // { required: true, message: <h1>我是 ReactNode</h1> },
+              // { type: 'number' },
+              // { type: 'enum', enum: ['aaa', 'bbb'] },
+              // { type: 'date' },
+              // { whitespace: true },
+              // { pattern: /^\w{3}$/ },
+              // {
+              //   message: '至少两个字符!',
+              //   validator: async (_, value) => {
+              //     if (value.length < 2) {
+              //       throw new Error();
+              //     }
+              //   },
+              // }
+            ]}
+          >
+            <EuiFieldText />
+          </FormRow>
+          <Field name="createdAt">
+            {(control, meta, context) => {
+              const { createdAt } = context.getFieldsValue(true);
+              return (
+                createdAt && (
+                  <EuiFormRow label="createdAt">
+                    <EuiText color="subdued" size="s">
+                      {moment(createdAt).format('YYYY-MM-DD HH:mm:ss')}
+                    </EuiText>
+                  </EuiFormRow>
+                )
+              );
+            }}
+          </Field>
+          <Field name="updatedAt">
+            {(control, meta, context) => {
+              const { updatedAt } = context.getFieldsValue(true);
+              return (
+                updatedAt && (
+                  <EuiFormRow label="updatedAt">
+                    <EuiText color="subdued" size="s">
+                      {moment(updatedAt).format('YYYY-MM-DD HH:mm:ss')}
+                    </EuiText>
+                  </EuiFormRow>
+                )
+              );
+            }}
+          </Field>
 
-        <EuiButton type="submit" fill>
-          Save form
-        </EuiButton>
-      </Form>
-    );
+          <EuiSpacer />
+
+          <EuiButton type="submit" fill>
+            Save form
+          </EuiButton>
+        </Form>
+      );
+    }
   };
   // ==================== Flyout
 
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
 
-  const closeFlyout = () => setIsFlyoutVisible(false);
+  const closeFlyout = () => {
+    form.resetFields();
+    setEditId(null);
+    editMutate(undefined, false);
+    setIsFlyoutVisible(false);
+  };
 
-  const showFlyout = () => setIsFlyoutVisible(true);
+  const showFlyout = id => {
+    setEditId(id);
+    setIsFlyoutVisible(true);
+  };
 
   let flyout;
 
@@ -383,6 +519,7 @@ export default function ExtList(props: IExtListProps) {
             <EuiSpacer />
             {renderDataTable()}
             {flyout}
+            {destroyModal}
           </EuiPageContentBody>
         </EuiPageContent>
       </EuiPageBody>
