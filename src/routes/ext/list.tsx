@@ -29,6 +29,7 @@ import moment from 'moment';
 import Form, { Field, useForm } from 'rc-field-form';
 import * as React from 'react';
 import { useRef, useState } from 'react';
+import FilePicker from '../../components/formControls/filePicker';
 import FormRow from '../../components/formRow';
 import { useDemoWeb, useDemoWebById } from '../../hook/useDemoWeb';
 import { useDemoWebMuation } from '../../hook/useDemoWebMuation';
@@ -56,6 +57,7 @@ export default function ExtList(props: IExtListProps) {
   const [selectedItems, setSelectedItems] = useState([]);
   const isLoading = !error && !data;
   const isEditLoading = !editError && !editData;
+
   const { create, update, destroy, state } = useDemoWebMuation();
   const { showToast } = useToast();
 
@@ -290,13 +292,21 @@ export default function ExtList(props: IExtListProps) {
 
   // ==================== Form
   const [form] = useForm();
+  const clearForm = () => {
+    form.setFieldsValue({
+      _id: null,
+      title: null,
+      image: null,
+      createdAt: null,
+      updatedAt: null,
+    });
+  };
   const handleFinish = values => {
     if (!editId) {
       create(values, err => {
         if (!err) {
           mutate();
           closeFlyout();
-          form.resetFields();
           showToast('创建成功');
         }
       });
@@ -305,14 +315,17 @@ export default function ExtList(props: IExtListProps) {
         if (!err) {
           mutate();
           closeFlyout();
-          form.resetFields();
           showToast('更新成功');
         }
       });
     }
   };
   const renderForm = () => {
-    if ((editId && editData) || !editId) {
+    if ((editId && !_.isEmpty(editData) && !isEditLoading) || !editId) {
+      if (form) {
+        form.setFieldsValue(editData);
+      }
+
       return (
         <Form
           form={form}
@@ -330,7 +343,6 @@ export default function ExtList(props: IExtListProps) {
           }}
           onFinish={handleFinish}
           className="euiForm"
-          initialValues={editId ? editData : {}}
         >
           {/* <Field name="_id" >
             {(control, meta, context) => {
@@ -421,6 +433,33 @@ export default function ExtList(props: IExtListProps) {
           >
             <EuiFieldText />
           </FormRow>
+          <FormRow
+            name="image"
+            label="image"
+            helpText="I am some friendly help text."
+            messageVariables={{ displayName: '封面' }}
+            rules={
+              [
+                // { required: true },
+                // { required: true, message: <h1>我是 ReactNode</h1> },
+                // { type: 'number' },
+                // { type: 'enum', enum: ['aaa', 'bbb'] },
+                // { type: 'date' },
+                // { whitespace: true },
+                // { pattern: /^\w{3}$/ },
+                // {
+                //   message: '至少两个字符!',
+                //   validator: async (_, value) => {
+                //     if (value.length < 2) {
+                //       throw new Error();
+                //     }
+                //   },
+                // }
+              ]
+            }
+          >
+            <FilePicker />
+          </FormRow>
           <Field name="createdAt">
             {(control, meta, context) => {
               const { createdAt } = context.getFieldsValue(true);
@@ -464,9 +503,9 @@ export default function ExtList(props: IExtListProps) {
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
 
   const closeFlyout = () => {
-    form.resetFields();
+    clearForm();
+    editMutate({}, false);
     setEditId(null);
-    editMutate(undefined, false);
     setIsFlyoutVisible(false);
   };
 

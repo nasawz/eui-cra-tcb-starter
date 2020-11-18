@@ -42,9 +42,8 @@ export function useDemoWebById(Id) {
   return useSWR(['demo_web', Id], async () => {
     return new Promise((resolve, reject) => {
       if (!Id) {
-        resolve(undefined);
+        resolve({});
       }
-
       db.collection('demo_web')
         .doc(Id)
         .get()
