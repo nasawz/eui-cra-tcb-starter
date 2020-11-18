@@ -10,6 +10,7 @@ import Ext from './ext';
 import ExtForm from './ext/form';
 import ExtList from './ext/list';
 import { useUser } from '../hook/useUser';
+import ExtScf from './ext/scf';
 
 export interface IAppProps {
   children?: any;
@@ -82,6 +83,7 @@ export default function App(props: IAppProps) {
               <Route exact path="/ext" component={Ext} />
               <Route path="/ext/list" component={ExtList} />
               <Route path="/ext/form" component={ExtForm} />
+              <Route path="/ext/scf" component={ExtScf} />
               <Route path="*">
                 <NoMatch />
               </Route>

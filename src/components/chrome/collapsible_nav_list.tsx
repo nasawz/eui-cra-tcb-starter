@@ -4,12 +4,17 @@ export const NavLinks: EuiPinnableListGroupItemProps[] = [
   {
     label: '列表',
     href: '/#/ext/list',
-    iconType: 'grid',
+    iconType: 'tableDensityNormal',
   },
   {
     label: '表单',
     href: '/#/ext/form',
-    iconType: 'grid',
+    iconType: 'documentEdit',
+  },
+  {
+    label: '云函数',
+    href: '/#/ext/scf',
+    iconType: 'node',
   },
 ];
 
