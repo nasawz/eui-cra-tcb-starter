@@ -24,6 +24,7 @@ import { useState } from 'react';
 import _ from 'lodash';
 import { NavLinks, TopLinks } from './collapsible_nav_list';
 import ToastList from '../toastList';
+import { useUser } from '../../hook/useUser';
 
 export interface ILogoProps {
   onClick: any;
@@ -41,7 +42,9 @@ export interface IChromeProps {
 }
 
 export default function Chrome(props: IChromeProps) {
+  const { user } = useUser();
   const history = useHistory();
+
   const [navIsOpen, setNavIsOpen] = useState(
     JSON.parse(String(localStorage.getItem('navIsDocked'))) || false,
   );
@@ -126,6 +129,11 @@ export default function Chrome(props: IChromeProps) {
   //   history.push(path);
   //   setNavIsOpen(false);
   // };
+
+  if (!user) {
+    history.replace('/login');
+    return null;
+  }
 
   const collapsibleNav = (
     <EuiCollapsibleNav
