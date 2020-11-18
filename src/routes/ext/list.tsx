@@ -99,7 +99,6 @@ export default function ExtList(props: IExtListProps) {
         <EuiButton
           color="danger"
           onClick={() => {
-            console.log(selectedItems);
             const ids = selectedItems.map((o: any) => {
               return o._id;
             });

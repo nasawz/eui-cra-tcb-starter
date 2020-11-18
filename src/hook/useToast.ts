@@ -13,7 +13,7 @@ export function useToast() {
       false,
     );
   };
-  const showToast = (title, color = 'success', iconType = null) => {
+  const showToast = (title, color = 'success', iconType: any = null) => {
     const newToasts = toasts!.concat({
       id: htmlIdGenerator('Id')(),
       title,
