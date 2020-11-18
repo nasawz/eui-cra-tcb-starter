@@ -9,3 +9,5 @@ TODO
 <!-- https://github.com/TencentCloudBase/cloudbase-js-sdk -->
 <!-- https://github.com/TencentCloudBase/tcb-admin-node -->
 <!-- https://elastic.github.io/eui/#/ -->
+<!-- https://cloud.tencent.com/document/product/460/36540 -->
+<!-- https://developers.weixin.qq.com/miniprogram/dev/wxcloud/reference-http-api/ -->
